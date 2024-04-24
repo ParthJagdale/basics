@@ -1,0 +1,39 @@
+import numpy as np
+import pandas as pd
+import seaborn as sns
+from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import train_test_split
+from keras.models import Sequential
+from keras.layers import Dense
+
+data = pd.read_csv("boston.csv")
+# data = pd.read_csv('/content/HousingData.csv')
+
+
+# Split the data into input and output variables
+X = data.drop('Price', axis=1)
+y = data['Price']
+
+# Scale the input features
+scaler = StandardScaler()
+X = scaler.fit_transform(X)
+
+# Split the data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
+
+# Define the model architecture
+model = Sequential()
+model.add(Dense(128, activation='relu', input_dim=14))
+model.add(Dense(64, activation='relu'))
+model.add(Dense(32, activation='relu'))
+model.add(Dense(16, activation='relu'))
+model.add(Dense(1))
+
+# Compile the model
+model.compile(optimizer='adam', loss='mean_squared_error', metrics=['mae'])
+
+# Train the model
+history = model.fit(X_train, y_train, epochs=20, batch_size=512, validation_data=(X_train, y_train))
+
+# Evaluate the model on test data
+results = model.evaluate(X_test, y_test)
